@@ -1,5 +1,6 @@
 import Fusion from "@rbxts/fusion-3.0";
 import { Palette, Shape, Spacing, Transparency, Typography } from "../ui/theme";
+import { Icon } from "./Icon";
 
 const { Children, Computed, New, OnEvent, Value, peek } = Fusion;
 
@@ -15,7 +16,6 @@ const HEADER_HEIGHT = 48;
 
 export function Accordion(scope: Fusion.Scope<unknown>, props: AccordionProps): Frame {
 	const expanded = props.expanded ?? Value(scope, props.defaultExpanded ?? false);
-	const chevron = Computed(scope, (use) => (use(expanded) ? "▾" : "▸"));
 
 	const contentChildren: Instance[] = [
 		New(scope, "UIListLayout")({
@@ -87,18 +87,35 @@ export function Accordion(scope: Fusion.Scope<unknown>, props: AccordionProps): 
 				TextXAlignment: Enum.TextXAlignment.Left,
 				LayoutOrder: 1,
 			}),
-			New(scope, "TextLabel")({
-				Name: "Chevron",
-				Size: new UDim2(0, 24, 1, 0),
-				BackgroundTransparency: 1,
-				Text: chevron,
-				TextColor3: Palette.common.black,
-				TextTransparency: Transparency.textSecondary,
-				TextSize: 16,
-				Font: Enum.Font.GothamBold,
-				TextXAlignment: Enum.TextXAlignment.Right,
-				LayoutOrder: 2,
-			}),
+			(() => {
+				const downIcon = Icon(scope, {
+					name: "arrowDown",
+					size: 16,
+					color: "default",
+					transparency: Computed(scope, (use) =>
+						use(expanded) ? Transparency.textSecondary : 1,
+					),
+				});
+				const rightIcon = Icon(scope, {
+					name: "arrowRight",
+					size: 16,
+					color: "default",
+					transparency: Computed(scope, (use) =>
+						use(expanded) ? 1 : Transparency.textSecondary,
+					),
+				});
+				downIcon.AnchorPoint = new Vector2(0.5, 0.5);
+				downIcon.Position = new UDim2(0.5, 0, 0.5, 0);
+				rightIcon.AnchorPoint = new Vector2(0.5, 0.5);
+				rightIcon.Position = new UDim2(0.5, 0, 0.5, 0);
+				return New(scope, "Frame")({
+					Name: "Chevron",
+					Size: new UDim2(0, 24, 0, 24),
+					BackgroundTransparency: 1,
+					LayoutOrder: 2,
+					[Children]: [downIcon, rightIcon],
+				});
+			})(),
 		],
 	});
 
