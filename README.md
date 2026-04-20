@@ -94,11 +94,95 @@ const heading = Typography.h5;
 const accent = Palette.primary.main;
 ```
 
+## Icons
+
+Icons come from a single sprite sheet (Kenney Game Icons — 6 columns × 20 rows, white-on-transparent). The PNG lives at [src/assets/icons.png](src/assets/icons.png) in this repo. Ship once, reference everywhere by name.
+
+### One-time setup
+
+1. Upload [src/assets/icons.png](src/assets/icons.png) to Roblox as a Decal/Image asset.
+2. Register the resulting asset ID at startup:
+
+```ts
+import { configureIcons } from "@rbxts/big-ui";
+
+configureIcons({ sheetAssetId: "rbxassetid://123456789" });
+```
+
+Call `configureIcons` **before mounting UI** (same rule as `configureTheme`). Until it's called, icons render blank.
+
+### Using icons
+
+**As standalone glyphs:**
+
+```ts
+import { Icon } from "@rbxts/big-ui";
+
+Icon(scope, { name: "settings", size: 24, color: "primary" });
+Icon(scope, { name: "close", color: Color3.fromRGB(255, 100, 100) });
+```
+
+**Inside an `IconButton`:**
+
+```ts
+import { IconButton } from "@rbxts/big-ui";
+
+IconButton(scope, {
+    icon: "trash",
+    size: "medium",
+    color: "error",
+    onActivate: () => print("delete"),
+});
+```
+
+**Before / after a `Button` label** (same convention as MUI):
+
+```ts
+import { Button } from "@rbxts/big-ui";
+
+Button(scope, {
+    label: "Save",
+    startIcon: "save",
+    variant: "contained",
+});
+
+Button(scope, {
+    label: "Continue",
+    endIcon: "arrowRight",
+    variant: "outlined",
+});
+```
+
+### Available icon names
+
+The full set is defined in [src/ui/icons.ts](src/ui/icons.ts) and typed as `IconName`. Your IDE will autocomplete. Examples: `close`, `check`, `settings`, `trash`, `save`, `play`, `pause`, `home`, `user`, `users`, `star`, `warning`, `info`, `help`, `zoomIn`, `zoomOut`, `volume`, `arrowUp`/`Down`/`Left`/`Right`, gamepad buttons (`buttonA`, `buttonB`, `buttonX`, `buttonY`, `buttonL1`/`L2`/`R1`/`R2`, `buttonStart`, `buttonSelect`), and many more.
+
+### Raw offsets
+
+If you need to place an icon yourself (e.g. on a custom `ImageLabel`), use the `Icons` dictionary and `applyIcon` helper:
+
+```ts
+import Fusion from "@rbxts/fusion-3.0";
+import { Icons, applyIcon, getIconSheetAssetId } from "@rbxts/big-ui";
+
+const img = Fusion.New(scope, "ImageLabel")({
+    Size: new UDim2(0, 32, 0, 32),
+    Image: getIconSheetAssetId(),
+    BackgroundTransparency: 1,
+});
+applyIcon(img, "wrench"); // sets ImageRectOffset + ImageRectSize
+```
+
+### Using a different sheet
+
+To swap in your own sprite sheet, either edit [src/ui/icons.ts](src/ui/icons.ts) with your own `Icons` dictionary before publishing a fork, or treat this package as a reference implementation and register your own `Icon` component against your own atlas.
+
 ## Components
 
 ### Inputs
-- `Button` — `contained` / `outlined` / `text` variants, six palette colors, three sizes, loading spinner
-- `IconButton` — compact glyph-only button
+- `Button` — `contained` / `outlined` / `text` variants, six palette colors, three sizes, loading spinner, optional `startIcon` / `endIcon`
+- `IconButton` — compact icon-only button (uses the sprite sheet)
+- `Icon` — standalone sprite-sheet icon
 - `Checkbox` — controlled boolean with optional label
 - `Switch` — controlled toggle
 - `RadioGroup` — controlled single-select list

@@ -11,6 +11,7 @@ export { CircularProgress } from "./components/CircularProgress";
 export { Divider } from "./components/Divider";
 export { Drawer } from "./components/Drawer";
 export { Dropdown } from "./components/Dropdown";
+export { Icon } from "./components/Icon";
 export { IconButton } from "./components/IconButton";
 export { LinearProgress } from "./components/LinearProgress";
 export { List, ListItem } from "./components/List";
@@ -35,6 +36,7 @@ export type { CircularProgressProps } from "./components/CircularProgress";
 export type { DividerProps } from "./components/Divider";
 export type { DrawerAnchor, DrawerProps } from "./components/Drawer";
 export type { DropdownOption, DropdownProps } from "./components/Dropdown";
+export type { IconProps } from "./components/Icon";
 export type { IconButtonProps, IconButtonSize } from "./components/IconButton";
 export type { LinearProgressProps } from "./components/LinearProgress";
 export type { ListItemProps, ListProps } from "./components/List";
@@ -77,3 +79,13 @@ export type {
 	TypographyVariant,
 	ZIndexDef,
 } from "./ui/theme";
+
+export {
+	ICON_SHEET,
+	Icons,
+	applyIcon,
+	configureIcons,
+	getIconSheetAssetId,
+} from "./ui/icons";
+
+export type { IconConfig, IconName, IconRect } from "./ui/icons";

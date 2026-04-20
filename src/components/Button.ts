@@ -8,6 +8,7 @@ import {
 	paletteFor,
 	type PaletteColor,
 } from "../ui/theme";
+import { Icons, getIconSheetAssetId, type IconName } from "../ui/icons";
 
 const { Children, Computed, New, OnEvent, Value, peek } = Fusion;
 
@@ -23,6 +24,10 @@ export interface ButtonProps {
 	/** When true, the button shows a spinner, hides its label, and blocks activations. */
 	loading?: Fusion.UsedAs<boolean>;
 	fullWidth?: boolean;
+	/** Icon rendered before the label. */
+	startIcon?: IconName;
+	/** Icon rendered after the label. */
+	endIcon?: IconName;
 	onActivate?: () => void;
 	layoutOrder?: number;
 }
@@ -32,12 +37,14 @@ interface SizeSpec {
 	padX: number;
 	textSize: number;
 	spinner: number;
+	icon: number;
+	gap: number;
 }
 
 const SIZE_TABLE: Record<ButtonSize, SizeSpec> = {
-	small: { height: 30, padX: 10, textSize: 13, spinner: 16 },
-	medium: { height: 36, padX: 16, textSize: 14, spinner: 18 },
-	large: { height: 42, padX: 22, textSize: 15, spinner: 22 },
+	small: { height: 30, padX: 10, textSize: 13, spinner: 16, icon: 16, gap: 6 },
+	medium: { height: 36, padX: 16, textSize: 14, spinner: 18, icon: 18, gap: 8 },
+	large: { height: 42, padX: 22, textSize: 15, spinner: 22, icon: 20, gap: 8 },
 };
 
 export function Button(scope: Fusion.Scope<unknown>, props: ButtonProps): TextButton {
@@ -73,12 +80,10 @@ export function Button(scope: Fusion.Scope<unknown>, props: ButtonProps): TextBu
 		return use(hovered) ? Transparency.hover : 1;
 	});
 
-	const textColor = Computed(scope, (_use) => {
-		if (disabled) return Palette.common.black;
-		return variant === "contained" ? palette.contrast : palette.main;
-	});
+	const foreground = variant === "contained" ? palette.contrast : palette.main;
+	const contentColor = disabled ? Palette.common.black : foreground;
 
-	const textTransparency = Computed(scope, (use) => {
+	const contentTransparency = Computed(scope, (use) => {
 		if (use(loading)) return 1;
 		return disabled ? Transparency.textDisabled : 0;
 	});
@@ -90,7 +95,64 @@ export function Button(scope: Fusion.Scope<unknown>, props: ButtonProps): TextBu
 		disabled ? Transparency.disabledBg : 0,
 	);
 
-	const spinnerColor = variant === "contained" ? palette.contrast : palette.main;
+	const contentChildren: Instance[] = [
+		New(scope, "UIListLayout")({
+			FillDirection: Enum.FillDirection.Horizontal,
+			VerticalAlignment: Enum.VerticalAlignment.Center,
+			HorizontalAlignment: Enum.HorizontalAlignment.Center,
+			SortOrder: Enum.SortOrder.LayoutOrder,
+			Padding: new UDim(0, sizing.gap),
+		}),
+	];
+
+	const makeIcon = (name: IconName, order: number): ImageLabel => {
+		const rect = Icons[name];
+		return New(scope, "ImageLabel")({
+			Name: order === 1 ? "StartIcon" : "EndIcon",
+			Size: new UDim2(0, sizing.icon, 0, sizing.icon),
+			BackgroundTransparency: 1,
+			BorderSizePixel: 0,
+			Image: getIconSheetAssetId(),
+			ImageRectOffset: rect.offset,
+			ImageRectSize: rect.size,
+			ImageColor3: contentColor,
+			ImageTransparency: contentTransparency,
+			ScaleType: Enum.ScaleType.Fit,
+			LayoutOrder: order,
+		});
+	};
+
+	if (props.startIcon !== undefined) {
+		contentChildren.push(makeIcon(props.startIcon, 1));
+	}
+
+	contentChildren.push(
+		New(scope, "TextLabel")({
+			Name: "Label",
+			Size: new UDim2(0, 0, 1, 0),
+			AutomaticSize: Enum.AutomaticSize.X,
+			BackgroundTransparency: 1,
+			Text: string.upper(props.label),
+			Font: Typography.button.font,
+			TextSize: sizing.textSize,
+			TextColor3: contentColor,
+			TextTransparency: contentTransparency,
+			TextXAlignment: Enum.TextXAlignment.Center,
+			TextYAlignment: Enum.TextYAlignment.Center,
+			LayoutOrder: 2,
+		}),
+	);
+
+	if (props.endIcon !== undefined) {
+		contentChildren.push(makeIcon(props.endIcon, 3));
+	}
+
+	const content = New(scope, "Frame")({
+		Name: "Content",
+		Size: new UDim2(1, 0, 1, 0),
+		BackgroundTransparency: 1,
+		[Children]: contentChildren,
+	});
 
 	return New(scope, "TextButton")({
 		Name: "Button",
@@ -101,11 +163,7 @@ export function Button(scope: Fusion.Scope<unknown>, props: ButtonProps): TextBu
 		BackgroundColor3: bgColor,
 		BackgroundTransparency: bgTransparency,
 		BorderSizePixel: 0,
-		Text: string.upper(props.label),
-		Font: Typography.button.font,
-		TextSize: sizing.textSize,
-		TextColor3: textColor,
-		TextTransparency: textTransparency,
+		Text: "",
 		AutoButtonColor: false,
 		Active: interactable,
 		LayoutOrder: props.layoutOrder ?? 0,
@@ -136,6 +194,7 @@ export function Button(scope: Fusion.Scope<unknown>, props: ButtonProps): TextBu
 					ApplyStrokeMode: Enum.ApplyStrokeMode.Border,
 				})
 				: undefined,
+			content,
 			New(scope, "Frame")({
 				Name: "SpinnerSlot",
 				AnchorPoint: new Vector2(0.5, 0.5),
@@ -146,7 +205,7 @@ export function Button(scope: Fusion.Scope<unknown>, props: ButtonProps): TextBu
 				[Children]: CircularProgress(scope, {
 					size: sizing.spinner,
 					thickness: 2,
-					colorOverride: spinnerColor,
+					colorOverride: foreground,
 				}),
 			}),
 		],

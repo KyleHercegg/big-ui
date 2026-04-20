@@ -122,7 +122,7 @@ export function Alert(scope: Fusion.Scope<unknown>, props: AlertProps): Frame {
 	if (props.onClose !== undefined) {
 		items.push(
 			IconButton(scope, {
-				icon: "✕",
+				icon: "close",
 				size: "small",
 				color: props.severity,
 				onActivate: props.onClose,

@@ -1,15 +1,14 @@
 import Fusion from "@rbxts/fusion-3.0";
 import { Palette, Transparency, paletteFor, type PaletteColor } from "../ui/theme";
+import { Icons, getIconSheetAssetId, type IconName } from "../ui/icons";
 
 const { Children, Computed, New, OnEvent, Value } = Fusion;
 
 export type IconButtonSize = "small" | "medium" | "large";
 
 export interface IconButtonProps {
-	// Single glyph / short string. For full icon atlases you'd swap to an
-	// ImageLabel child instead — this primitive stays text-based to keep the
-	// dependency surface small.
-	icon: string;
+	/** Icon name from the sprite sheet (see `ui/icons.ts`). */
+	icon: IconName;
 	size?: IconButtonSize;
 	color?: PaletteColor | "default";
 	disabled?: boolean;
@@ -33,6 +32,7 @@ export function IconButton(scope: Fusion.Scope<unknown>, props: IconButtonProps)
 
 	const isDefault = color === "default";
 	const iconColor = isDefault ? Palette.text.primary : paletteFor(color).main;
+	const rect = Icons[props.icon];
 
 	const bgTransparency = Computed(scope, (use) => {
 		if (disabled) return 1;
@@ -53,13 +53,7 @@ export function IconButton(scope: Fusion.Scope<unknown>, props: IconButtonProps)
 		BackgroundColor3: Palette.common.black,
 		BackgroundTransparency: bgTransparency,
 		BorderSizePixel: 0,
-		Text: props.icon,
-		Font: Enum.Font.GothamMedium,
-		TextSize: sizing.icon,
-		TextColor3: iconColor,
-		TextTransparency: iconTransparency,
-		TextXAlignment: Enum.TextXAlignment.Center,
-		TextYAlignment: Enum.TextYAlignment.Center,
+		Text: "",
 		AutoButtonColor: false,
 		Active: !disabled,
 		LayoutOrder: props.layoutOrder ?? 0,
@@ -68,6 +62,22 @@ export function IconButton(scope: Fusion.Scope<unknown>, props: IconButtonProps)
 		[OnEvent("Activated")]: () => {
 			if (!disabled && props.onActivate !== undefined) props.onActivate();
 		},
-		[Children]: New(scope, "UICorner")({ CornerRadius: new UDim(1, 0) }),
+		[Children]: [
+			New(scope, "UICorner")({ CornerRadius: new UDim(1, 0) }),
+			New(scope, "ImageLabel")({
+				Name: "Icon",
+				AnchorPoint: new Vector2(0.5, 0.5),
+				Position: new UDim2(0.5, 0, 0.5, 0),
+				Size: new UDim2(0, sizing.icon, 0, sizing.icon),
+				BackgroundTransparency: 1,
+				BorderSizePixel: 0,
+				Image: getIconSheetAssetId(),
+				ImageRectOffset: rect.offset,
+				ImageRectSize: rect.size,
+				ImageColor3: iconColor,
+				ImageTransparency: iconTransparency,
+				ScaleType: Enum.ScaleType.Fit,
+			}),
+		],
 	});
 }
