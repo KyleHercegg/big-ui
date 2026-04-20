@@ -1,6 +1,8 @@
 import Fusion from "@rbxts/fusion-3.0";
+import { Icon } from "./Icon";
 import { IconButton } from "./IconButton";
 import { Shape, paletteFor } from "../ui/theme";
+import type { IconName } from "../ui/icons";
 
 const { Children, New } = Fusion;
 
@@ -14,11 +16,11 @@ export interface AlertProps {
 	layoutOrder?: number;
 }
 
-const ICONS: Record<AlertSeverity, string> = {
-	info: "ⓘ",
-	success: "✓",
-	warning: "!",
-	error: "✕",
+const ICONS: Record<AlertSeverity, IconName> = {
+	info: "info",
+	success: "check",
+	warning: "warning",
+	error: "close",
 };
 
 export function Alert(scope: Fusion.Scope<unknown>, props: AlertProps): Frame {
@@ -48,6 +50,14 @@ export function Alert(scope: Fusion.Scope<unknown>, props: AlertProps): Frame {
 	];
 
 	// Severity icon in a small coloured circle.
+	const badgeIcon = Icon(scope, {
+		name: icon,
+		size: 14,
+		color: palette.contrast,
+	});
+	badgeIcon.AnchorPoint = new Vector2(0.5, 0.5);
+	badgeIcon.Position = new UDim2(0.5, 0, 0.5, 0);
+
 	items.push(
 		New(scope, "Frame")({
 			Name: "IconBadge",
@@ -57,16 +67,7 @@ export function Alert(scope: Fusion.Scope<unknown>, props: AlertProps): Frame {
 			LayoutOrder: 1,
 			[Children]: [
 				New(scope, "UICorner")({ CornerRadius: new UDim(1, 0) }),
-				New(scope, "TextLabel")({
-					Size: new UDim2(1, 0, 1, 0),
-					BackgroundTransparency: 1,
-					Text: icon,
-					TextColor3: palette.contrast,
-					TextSize: 14,
-					Font: Enum.Font.GothamBold,
-					TextXAlignment: Enum.TextXAlignment.Center,
-					TextYAlignment: Enum.TextYAlignment.Center,
-				}),
+				badgeIcon,
 			],
 		}),
 	);
