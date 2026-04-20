@@ -1,39 +1,57 @@
 {
-  "name": "@rbxts/big-ui",
-  "version": "1.0.0",
-  "main": "out/init.luau",
-  "scripts": {
-    "build": "rbxtsc",
-    "watch": "rbxtsc -w",
-    "prepublishOnly": "npm run build"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "types": "out/index.d.ts",
-  "files": [
-    "out",
-    "!**/*.tsbuildinfo"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "devDependencies": {
-    "@rbxts/compiler-types": "^3.0.0-types.0",
-    "@rbxts/types": "^1.0.916",
-    "@typescript-eslint/eslint-plugin": "^8.58.2",
-    "@typescript-eslint/parser": "^8.58.2",
-    "eslint": "^10.2.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-roblox-ts": "^1.4.0",
-    "prettier": "^3.8.3",
-    "roblox-ts": "^3.0.0",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@rbxts/fusion-3.0": "^0.1.0",
-    "@rbxts/services": "^1.6.0"
-  }
+	"name": "@rbxts/big-ui",
+	"version": "1.0.0",
+	"description": "Material-UI-inspired component library for Roblox-TS, built on Fusion 3.0. Ships 23 themeable primitives with a single configureTheme entrypoint for customization.",
+	"main": "out/init.luau",
+	"types": "out/index.d.ts",
+	"scripts": {
+		"build": "rm -rf out && rbxtsc",
+		"watch": "rbxtsc -w",
+		"prepublishOnly": "npm run build"
+	},
+	"keywords": [
+		"roblox",
+		"roblox-ts",
+		"rbxts",
+		"ui",
+		"components",
+		"fusion",
+		"material-ui",
+		"mui",
+		"theme"
+	],
+	"author": "Kyle Herceg",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/KyleHercegg/big-ui.git"
+	},
+	"homepage": "https://github.com/KyleHercegg/big-ui#readme",
+	"bugs": {
+		"url": "https://github.com/KyleHercegg/big-ui/issues"
+	},
+	"files": [
+		"out",
+		"!**/*.tsbuildinfo"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"devDependencies": {
+		"@rbxts/compiler-types": "^3.0.0-types.0",
+		"@rbxts/types": "^1.0.916",
+		"@typescript-eslint/eslint-plugin": "^8.58.2",
+		"@typescript-eslint/parser": "^8.58.2",
+		"eslint": "^10.2.1",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-prettier": "^5.5.5",
+		"eslint-plugin-roblox-ts": "^1.4.0",
+		"prettier": "^3.8.3",
+		"roblox-ts": "^3.0.0",
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"@rbxts/fusion-3.0": "^0.1.0",
+		"@rbxts/services": "^1.6.0"
+	}
 }
