@@ -115,6 +115,7 @@ export function Drawer(scope: Fusion.Scope<unknown>, props: DrawerProps): Screen
 			}),
 			New(scope, "Frame")({
 				Name: "Panel",
+				Active: true,
 				AnchorPoint: spec.anchorPoint,
 				Size: spec.panelSize,
 				Position: animatedPos,
